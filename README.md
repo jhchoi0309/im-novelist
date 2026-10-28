@@ -15,6 +15,8 @@ Claude, Gemini, GPT에서 같은 편집 원칙을 사용할 수 있습니다. Ag
 
 긴 글은 대표 문장과 여러 문단의 흐름을 함께 살핍니다. 영향이나 기여를 더 강한 원인으로 바꾸지 않고, 과거 평가 결과를 미래 성능으로 확대하지 않습니다. 분량·블라인드·사실·문서 배치 검사는 요청이나 해당 조건이 있을 때만 추가합니다.
 
+지원서에서는 제공된 경험과 지원자의 판단이 읽히는지 확인하며 개인과 팀의 역할을 구분합니다. 수치와 조건을 임의로 빼거나 경험을 만들어 내지 않습니다. 반복 수정 때 이전 피드백과 실제 변화도 함께 살핍니다. 문체만 수정해 달라는 요청과 구조 개편 요청은 구분합니다.
+
 ## 바로 쓰기: Claude · Gemini · ChatGPT
 
 1. [독립 프롬프트](prompts/im-poetry.md)의 **전체 내용**을 복사합니다. GitHub 화면에서는 Raw로 열면 편합니다.
@@ -106,7 +108,7 @@ python3 scripts/count_text.py 원고.txt --encoding utf-8 --newlines lf --max-by
 | 경로 | 용도 |
 | --- | --- |
 | [SKILL.md](SKILL.md) | 공통 지침과 작업 순서 |
-| [references](references) | 패턴·의미·목소리, 긴 글 예시와 선택형 검사 절차 |
+| [references](references) | 패턴·의미·목소리, 긴 글·지원서 예시와 선택형 검사 절차 |
 | [prompts/im-poetry.md](prompts/im-poetry.md) | 파일 접근이 없는 대화창용 독립 프롬프트 |
 | [docs/compatibility.md](docs/compatibility.md) | 서비스별 설치와 사용 범위 |
 | [docs/research.md](docs/research.md) | 출처, 근거의 범위, 설계에 반영한 판단 |

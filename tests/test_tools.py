@@ -24,6 +24,7 @@ class InstallerTests(unittest.TestCase):
         install(ROOT, self.target)
         self.assertEqual(package_files(ROOT), package_files(self.target))
         self.assertTrue((self.target / "scripts/count_text.py").is_file())
+        self.assertTrue((self.target / "references/applications.md").is_file())
         self.assertFalse((self.target / "scripts/install.py").exists())
         self.assertFalse((self.target / "README.md").exists())
 

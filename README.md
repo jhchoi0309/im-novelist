@@ -13,6 +13,8 @@ Claude, Gemini, GPT에서 같은 편집 원칙을 사용할 수 있습니다. Ag
 
 '있다', '것', '수 있다', 부사, 피동문을 금칙어로 취급하지 않습니다. 가능성, 시간, 감정, 인용, 수치, 코드처럼 보존해야 할 내용을 먼저 확인합니다. 에세이·메시지·지원서·보고서·기술 설명을 각각의 목적에 맞게 다듬습니다.
 
+긴 글은 대표 문장과 여러 문단의 흐름을 함께 살핍니다. 영향이나 기여를 더 강한 원인으로 바꾸지 않고, 과거 평가 결과를 미래 성능으로 확대하지 않습니다. 분량·블라인드·사실·문서 배치 검사는 요청이나 해당 조건이 있을 때만 추가합니다.
+
 ## 바로 쓰기: Claude · Gemini · ChatGPT
 
 1. [독립 프롬프트](prompts/im-poetry.md)의 **전체 내용**을 복사합니다. GitHub 화면에서는 Raw로 열면 편합니다.
@@ -30,7 +32,7 @@ Claude의 프로젝트 지침이나 Gemini의 Gem 지침을 사용하는 경우�
 
 ## Agent Skills로 설치하기
 
-Python 3.10 이상이 필요합니다. 실행 전 코드를 확인할 수 있으며, 설치기는 네트워크를 사용하지 않습니다. 기존 스킬이나 설정 파일을 덮어쓰지 않습니다.
+Python 3.10 이상이 필요합니다. 실행 전 코드를 확인할 수 있으며, 설치기는 네트워크를 사용하지 않습니다. 기본 설치에서는 기존 스킬이나 설정 파일을 덮어쓰지 않습니다.
 
 ```bash
 git clone https://github.com/jhchoi0309/im-poetry.git
@@ -54,7 +56,32 @@ python3 scripts/install.py --target codex
 python3 scripts/install.py --target claude --project /path/to/project --dry-run
 ```
 
-이미 다른 내용의 `im-poetry` 폴더가 있으면 설치가 중단됩니다. 기존 폴더를 별도 위치에 백업하거나 `--destination /exact/path/im-poetry`로 다른 설치 위치를 지정하세요. `--destination`은 대상 폴더의 정확한 경로입니다.
+이미 다른 내용의 `im-poetry` 폴더가 있으면 기본 설치가 중단됩니다. 기존 스킬을 업데이트하려면 저장소의 최신 버전을 받은 뒤 대상별로 `--update`를 추가하세요. 이전 폴더 전체는 같은 스킬 디렉터리 안의 숨김 백업 폴더에 보관하고 경로를 출력합니다. 다른 스킬이거나 심볼릭 링크인 경우에는 교체하지 않습니다. `--destination /exact/path/im-poetry`로 다른 정확한 위치를 지정할 수도 있습니다.
+
+```bash
+git pull --ff-only
+python3 scripts/install.py --target claude --update
+python3 scripts/install.py --target gemini --update
+python3 scripts/install.py --target codex --update
+```
+
+## 선택형 검토
+
+제한과 공고 기준이 있을 때 다음처럼 요청할 수 있습니다.
+
+```text
+아래 지원서를 다듬어줘. 대표 문장 두 개의 목소리를 살리고,
+본문은 UTF-8 기준 1,000바이트 이내야. 공백과 LF 줄바꿈을 포함해줘.
+학교명과 내가 제공한 금지 명칭도 공고 기준으로 점검해줘.
+```
+
+바이트를 직접 확인하려면 UTF-8 텍스트 파일로 저장한 최종 원고와 제출처의 기준을 사용합니다.
+
+```bash
+python3 scripts/count_text.py 원고.txt --encoding utf-8 --newlines lf --max-bytes 1000
+```
+
+원문 줄바꿈을 유지하려면 `--newlines preserve`, CRLF로 계산하려면 `--newlines crlf`를 지정합니다. 공백과 마지막 줄바꿈, 입력에 있는 UTF-8 BOM은 계산에 포함합니다. 제출처마다 바이트·줄바꿈 기준이 다를 수 있으며, 자체 환산 규칙은 해당 시스템에서 따로 확인해야 합니다. 블라인드 최종 판정은 채용기관 기준에 따릅니다. 사실 검증과 문서의 시각적 배치 검사도 실제 자료와 최종 파일을 확인한 범위만 보고합니다.
 
 ## 예시
 
@@ -79,13 +106,13 @@ python3 scripts/install.py --target claude --project /path/to/project --dry-run
 | 경로 | 용도 |
 | --- | --- |
 | [SKILL.md](SKILL.md) | 공통 지침과 작업 순서 |
-| [references](references) | 패턴·예외, 의미 보존 예시, 장르별 기준 |
+| [references](references) | 패턴·의미·목소리, 긴 글 예시와 선택형 검사 절차 |
 | [prompts/im-poetry.md](prompts/im-poetry.md) | 파일 접근이 없는 대화창용 독립 프롬프트 |
 | [docs/compatibility.md](docs/compatibility.md) | 서비스별 설치와 사용 범위 |
 | [docs/research.md](docs/research.md) | 출처, 근거의 범위, 설계에 반영한 판단 |
 | [docs/evaluation.md](docs/evaluation.md) | 평가 방법과 검증 범위 |
 | [evals/cases.json](evals/cases.json) | 의미 보존·말투·모호함에 대한 사례 |
-| [scripts](scripts) | 설치·프롬프트 생성·구조 검사 |
+| [scripts](scripts) | 설치·바이트 계산·프롬프트 생성·구조 검사 |
 
 ## 검증과 수정
 

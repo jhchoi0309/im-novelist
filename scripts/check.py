@@ -20,6 +20,7 @@ def check(root: Path) -> list[str]:
     required = (
         "SKILL.md", "README.md", "LICENSE", "agents/openai.yaml",
         "references/patterns.md", "references/meaning.md", "references/voice.md",
+        "references/long-form.md", "references/checks.md", "scripts/count_text.py",
         "docs/compatibility.md", "docs/research.md", "docs/evaluation.md",
         "prompts/im-poetry.md", "evals/cases.json",
     )

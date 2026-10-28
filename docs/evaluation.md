@@ -81,3 +81,19 @@ python3 -m unittest discover -s tests -v
 3. 수정 전후를 위 표로 대조하고 새로 생긴 오류부터 확인하세요.
 4. 변경한 규칙과 관련된 사례, 아직 보지 않은 원고로 다시 실행하세요.
 5. 결과가 좋았다고 금칙어나 수치 기준을 늘리지 마세요. 고치지 않아야 할 예시도 유지하세요.
+
+## 2026-10-28 운영체제 호환성 보강
+
+설치기에서 UTF-8 BOM과 CRLF frontmatter를 허용하고 스킬명 검사는 유지했습니다. 홈·프로젝트 경로 계산, 한글·공백·이모지 경로, Windows junction 보호를 추가했습니다. Python 공통 설치·업로드 도구와 선택적인 PowerShell·셸 실행 도구를 배포 패키지에 포함합니다.
+
+이번 세션의 실제 실행 환경은 Linux / Python 3.12입니다. 원격 GitHub 호출을 모의 응답으로 바꾸고 실제 로컬 Git 저장소에서 생성·push·원격 SHA 확인·멱등성·이력 충돌을 검사했습니다. 체크섬 손상·인증 계정 불일치·네트워크 오류·설치 전 전체 대상 검사를 확인합니다. 패키지 복원과 설치 테스트에는 실제 두 스킬의 설치 코드가 사용됩니다.
+
+CI는 `ubuntu-latest`, `macos-latest`, `windows-latest`와 Python 3.10·3.13의 6개 조합을 사용하도록 구성했습니다. 이 파일을 추가한 것이 CI 실행 완료를 뜻하지는 않습니다. Windows·macOS의 실제 실행 결과, PowerShell 실행 도구의 네이티브 결과는 아직 확인하지 않았습니다. Windows junction·PowerShell 검사는 해당 환경의 CI에서 수행합니다. 윤문 지침의 모델 평가와 설치 도구의 검증을 구분합니다.
+
+[Linux 실행 기록](portability-results.json): 총 45개 중 43개 통과, 네이티브 PowerShell·Windows junction 검사 2개 건너뜀. 실패와 오류는 없었습니다. 건너뛴 검사를 통과로 세지 않았습니다.
+
+## 링크 설치와 앱 지원
+
+README의 GitHub 링크 설치 요청을 AGENTS.md·CLAUDE.md·GEMINI.md와 설치 안내로 연결했습니다. Codex·Claude Code·Gemini CLI의 대상 선택과 Antigravity App/IDE·CLI의 서로 다른 사용자 경로를 포함합니다. Gemini 앱에는 계정 Skills 생성 지침과 별도의 텍스트 전용 가져오기 폴더를 제공합니다.
+
+앱용 폴더에 원본 SKILL.md·참고 문서가 들어 있고 설치·네트워크 업로드 도구가 제외되는지 자동 검사합니다. 단일 Gemini 앱 지침은 공통 원본에서 생성되는지 대조합니다. 실제 Gemini 앱 계정의 스킬 생성이나 각 회사 CLI가 GitHub 링크만 읽고 자율 설치하는 모델 행동은 이번 환경에서 실행하지 않았습니다. 플랫폼의 파일·계정 접근 권한과 기능 제공 여부가 필요합니다.

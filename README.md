@@ -1,5 +1,20 @@
 # im-novelist
 
+## 링크만 주고 설치 요청하기
+
+파일을 설치할 수 있는 **Codex·Claude Code·Gemini CLI·Antigravity** 대화에 다음 한 줄을 보내세요.
+
+```text
+https://github.com/jhchoi0309/im-novelist 이 스킬 설치해줘.
+```
+
+세 CLI(Codex·Claude Code·Gemini CLI)와 Antigravity가 현재 도구에 맞는 경로에 이 스킬을 설치하도록 [에이전트 설치 안내](docs/agent-install.md)를 제공합니다. 기본은 사용자 범위이며, “이 프로젝트에만 설치해줘”라고 하면 프로젝트 범위로 설치합니다. 기존 설치본은 백업하고 실제 설치 파일을 확인하도록 했습니다.
+
+**Gemini 앱에서도 사용:** 앱의 Skills 생성 기능에 연결하는 [앱용 안내](docs/gemini-app.md)와 [단일 지침](prompts/gemini-app.txt)을 제공합니다. 앱에서는 계정 스킬을 생성하고, CLI에서는 컴퓨터의 스킬 폴더에 설치합니다. 링크 내용을 읽고 Skills를 생성할 수 있는 앱에서는 같은 설치 요청으로 진행하도록 안내했습니다. 직접 가져올 수 있는 앱용 폴더도 배포 패키지에 포함합니다.
+
+**설치를 수행하는 에이전트에게:** `docs/agent-install.md`를 읽고 설치·검증을 완료하세요. `SKILL.md`만 읽고 설치가 끝났다고 보고하지 마세요. Python이 있으면 제공된 설치기를, 없으면 안내된 파일 복사 절차를 사용하세요. 호스트의 파일 접근·권한 정책을 따르세요.
+
+
 기존 `im-poetry`의 의미 보존·자연스러운 산문 퇴고 기능을 별도 스킬과 저장소로 이어갑니다. 기존 저장소와 로컬 설치본의 삭제는 이 프로젝트의 설치 과정에서 자동 수행하지 않습니다. 문학적·시적 표현을 적극적으로 더하고 싶다면 별도 스킬 [im-poet](https://github.com/jhchoi0309/im-poet)을 사용하세요.
 
 **글의 뜻과 말투를 살리며 AI식 표현을 다듬는 한국어 퇴고 스킬입니다.**
@@ -45,6 +60,24 @@ Claude, Gemini, GPT에서 같은 편집 원칙을 사용할 수 있습니다. Ag
 
 Claude의 프로젝트 지침이나 Gemini의 Gem 지침을 사용하는 경우에도 같은 프롬프트를 넣을 수 있습니다. 서비스별 기능과 파일 접근 방식은 [호환성 안내](docs/compatibility.md)를 참고하세요. 파일을 올렸다는 이유만으로 지침이 자동 적용된다고 가정하지 않습니다.
 
+## Windows · macOS · Linux
+
+Python 3.10 이상에서 동일한 설치기를 사용합니다. macOS·Linux에서는 `python3`, Windows PowerShell에서는 `py -3`로 실행하세요. Windows에서도 설치·업로드 도구를 Python으로 직접 실행할 수 있습니다.
+
+```powershell
+# Windows: 이 저장소 폴더에서 실행
+py -3 scripts/install.py --target codex --update
+```
+
+```bash
+# macOS · Linux: 이 저장소 폴더에서 실행
+python3 scripts/install.py --target codex --update
+```
+
+`codex` 대신 `claude`, `gemini`, `antigravity`(App·IDE), `antigravity-cli`를 선택할 수 있습니다. 패키지의 공통 `install.py`는 두 스킬을 함께 설치하고, `upload.py`는 GitHub 업로드를 처리합니다. 전체 소스와 번들이 함께 제공되므로 설치만 할 때 Git이나 GitHub CLI는 필요하지 않습니다. 자세한 운영체제별 명령은 [공통 패키지 안내](docs/package-usage.md)를 참고하세요.
+
+LF/CRLF와 UTF-8 BOM, 한글·공백 경로를 처리하고 설치 대상의 심볼릭 링크·Windows junction은 교체하지 않습니다. 현재 직접 실행한 환경은 Linux이며, Windows·macOS 검사는 함께 제공하는 CI에서 실행하도록 구성했습니다. [검증 범위](docs/evaluation.md)를 확인하세요.
+
 ## Agent Skills로 설치하기
 
 ### 이전 `im-poetry` 설치본에서 이름 바꾸기
@@ -58,7 +91,7 @@ python3 scripts/install.py --target gemini --migrate-from ~/.gemini/skills/im-po
 python3 scripts/install.py --target codex --migrate-from ~/.agents/skills/im-poetry
 ```
 
-설치했던 도구에 해당하는 명령만 사용하세요. 설치 경로를 따로 지정했다면 실제 이전 경로를 전달하세요. ChatGPT 개인 스킬과 맥의 도구별 설치본은 각각 별개입니다.
+설치했던 도구에 해당하는 명령만 사용하세요. 설치 경로를 따로 지정했다면 실제 이전 경로를 전달하세요. ChatGPT 개인 스킬과 각 컴퓨터의 도구별 설치본은 별개입니다.
 
 ### 새로 설치하기
 
@@ -79,6 +112,8 @@ python3 scripts/install.py --target codex
 | Claude Code | `~/.claude/skills/im-novelist/` | `/im-novelist`와 편집할 글을 전달 |
 | Gemini CLI | `~/.gemini/skills/im-novelist/` | `im-novelist`로 다듬어 달라고 요청 |
 | Codex | `~/.agents/skills/im-novelist/` | `$im-novelist`와 편집할 글을 전달 |
+| Antigravity App·IDE | `~/.gemini/config/skills/im-novelist/` | 스킬명과 편집할 글을 전달 |
+| Antigravity CLI | `~/.gemini/antigravity-cli/skills/im-novelist/` | 스킬명과 편집할 글을 전달 |
 
 특정 프로젝트에만 설치하려면 `--project /path/to/project`를 추가하세요. 설치 내용을 미리 확인하려면 `--dry-run`을 추가하세요. Gemini CLI는 `.agents/skills`도 읽으므로 Codex 경로의 공용 스킬을 사용할 수도 있습니다. 설치 위치를 여러 곳에 만들었다면 도구의 우선순위를 확인하세요.
 

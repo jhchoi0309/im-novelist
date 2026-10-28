@@ -7,13 +7,13 @@
 - `SKILL.md`: Agent Skills 형식. `name`, `description`만 frontmatter에 사용합니다. 핵심 규칙은 이 파일만으로 적용할 수 있습니다.
 - `references/`: 파일을 읽을 수 있는 환경에서 선택적으로 참고합니다.
 - `agents/openai.yaml`: OpenAI 계열 도구의 선택적 표시용 메타데이터입니다. 다른 도구는 이 파일을 사용할 필요가 없습니다.
-- `prompts/im-poetry.md`: `SKILL.md` 본문에서 생성합니다. frontmatter와 로컬 참조 부분을 제외한 독립 지침으로, 상대 경로의 파일을 읽을 필요가 없습니다. 프로젝트 자체의 길이 예산은 8,000자 이내입니다. 이것은 모든 서비스의 입력 한도가 같다는 뜻이 아닙니다.
+- `prompts/im-novelist.md`: `SKILL.md` 본문에서 생성합니다. frontmatter와 로컬 참조 부분을 제외한 독립 지침으로, 상대 경로의 파일을 읽을 필요가 없습니다. 프로젝트 자체의 길이 예산은 8,000자 이내입니다. 이것은 모든 서비스의 입력 한도가 같다는 뜻이 아닙니다.
 
 ## Claude
 
 ### Claude Code
 
-`python3 scripts/install.py --target claude`를 실행하면 사용자 스킬 경로에 필요한 파일만 복사합니다. `/im-poetry` 뒤에 원고와 요청을 전달하세요. 프로젝트 설치에는 `--project`를 사용합니다.
+`python3 scripts/install.py --target claude`를 실행하면 사용자 스킬 경로에 필요한 파일만 복사합니다. `/im-novelist` 뒤에 원고와 요청을 전달하세요. 프로젝트 설치에는 `--project`를 사용합니다.
 
 공식 문서는 사용자 경로 `~/.claude/skills/`, 프로젝트 경로 `.claude/skills/`, `SKILL.md` 형식과 명시적 스킬 호출을 설명합니다.
 
@@ -29,7 +29,7 @@
 
 ### Gemini CLI
 
-`python3 scripts/install.py --target gemini`를 실행하고 `im-poetry를 사용해 아래 글을 다듬어줘`라고 요청하세요. 목록에 보이지 않으면 `/skills list`로 확인하고 `/skills reload`로 다시 읽을 수 있습니다.
+`python3 scripts/install.py --target gemini`를 실행하고 `im-novelist를 사용해 아래 글을 다듬어줘`라고 요청하세요. 목록에 보이지 않으면 `/skills list`로 확인하고 `/skills reload`로 다시 읽을 수 있습니다.
 
 공식 문서는 `~/.gemini/skills/`, `.gemini/skills/`, 공용 별칭 `.agents/skills/`를 설명합니다. 같은 단계에 동일한 이름이 있으면 `.agents/skills/` 별칭이 우선됩니다. 따라서 Gemini와 Codex 설치본을 따로 유지한다면 버전 차이를 확인하세요.
 
@@ -45,7 +45,7 @@
 
 ### Codex
 
-`python3 scripts/install.py --target codex`를 실행하고 `$im-poetry`를 명시해 요청하세요. 사용자 설치 위치는 `~/.agents/skills/`, 프로젝트 설치 위치는 `.agents/skills/`입니다. 이 설치기는 ChatGPT의 클라우드 계정 설정을 변경하지 않습니다.
+`python3 scripts/install.py --target codex`를 실행하고 `$im-novelist`를 명시해 요청하세요. 사용자 설치 위치는 `~/.agents/skills/`, 프로젝트 설치 위치는 `.agents/skills/`입니다. 이 설치기는 ChatGPT의 클라우드 계정 설정을 변경하지 않습니다.
 
 출처: [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills).
 

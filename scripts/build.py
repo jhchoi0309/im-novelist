@@ -42,17 +42,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="Check without writing")
     args = parser.parse_args()
-    output = ROOT / "prompts" / "im-poetry.md"
+    output = ROOT / "prompts" / "im-novelist.md"
     expected = render((ROOT / "SKILL.md").read_text(encoding="utf-8"))
     if args.check:
         if not output.is_file() or output.read_text(encoding="utf-8") != expected:
-            print("Out of date: prompts/im-poetry.md; run python3 scripts/build.py")
+            print("Out of date: prompts/im-novelist.md; run python3 scripts/build.py")
             return 1
         print("Standalone prompt matches SKILL.md")
         return 0
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(expected, encoding="utf-8")
-    print(f"Built prompts/im-poetry.md ({len(expected)} characters)")
+    print(f"Built prompts/im-novelist.md ({len(expected)} characters)")
     return 0
 
 

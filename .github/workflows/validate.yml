@@ -1,4 +1,4 @@
-name: Validate im-poetry
+name: Validate im-novelist
 
 on:
   push:

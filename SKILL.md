@@ -1,9 +1,9 @@
 ---
-name: im-poetry
-description: "Edit Korean prose to reduce formulaic AI phrasing while preserving meaning and the writer's voice. Use for AI 어투 고쳐줘, AI 냄새 줄여줘, 자연스럽게 다듬어줘, 문장 퇴고, or Korean prose editing in essays, messages, applications, reports, and technical explanations. Do not apply automatically to code, literal quotations, translation-only tasks, or unrelated answers."
+name: im-novelist
+description: "Edit Korean prose to reduce formulaic AI phrasing while preserving meaning and the writer's voice. Use for AI 어투 고쳐줘, AI 냄새 줄여줘, 자연스럽게 다듬어줘, 문장 퇴고, or Korean prose editing in essays, messages, applications, reports, and technical explanations. Use im-poet instead when literary or poetic rewriting is explicitly requested. Do not apply automatically to code, literal quotations, translation-only tasks, or unrelated answers."
 ---
 
-# im-poetry
+# im-novelist
 
 한국어 글을 맥락에 맞게 다듬어라. 원문의 의미와 글쓴이의 목소리를 지키고, 독자의 이해를 방해하는 반복·과장·불분명한 연결을 고쳐라. 모든 글에 같은 문체를 입히지 마라.
 

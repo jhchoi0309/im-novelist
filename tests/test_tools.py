@@ -10,7 +10,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from build import render
-from install import existing_files, install, package_files
+from install import existing_files, install, migrate_legacy, package_files
 
 
 class InstallerTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class InstallerTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.base = Path(self.tmp.name)
-        self.target = self.base / "skills" / "im-poetry"
+        self.target = self.base / "skills" / "im-novelist"
 
     def test_install_is_complete_and_does_not_copy_development_files(self):
         install(ROOT, self.target)
@@ -50,10 +50,10 @@ class InstallerTests(unittest.TestCase):
     def test_update_preserves_previous_version_and_extra_files_in_backup(self):
         install(ROOT, self.target)
         (self.target / "notes.txt").write_text("keep me", encoding="utf-8")
-        (self.target / "SKILL.md").write_text("---\nname: im-poetry\n---\nold\n", encoding="utf-8")
+        (self.target / "SKILL.md").write_text("---\nname: im-novelist\n---\nold\n", encoding="utf-8")
         previous = existing_files(self.target)
         message = install(ROOT, self.target, update=True)
-        backups = list(self.target.parent.glob(".im-poetry-backup-*"))
+        backups = list(self.target.parent.glob(".im-novelist-backup-*"))
         self.assertIn("Updated:", message)
         self.assertEqual(len(backups), 1)
         self.assertEqual(existing_files(backups[0]), previous)
@@ -74,7 +74,7 @@ class InstallerTests(unittest.TestCase):
         message = install(ROOT, self.target, dry_run=True, update=True)
         self.assertIn("Would update with backup", message)
         self.assertEqual(existing_files(self.target), before)
-        self.assertFalse(list(self.target.parent.glob(".im-poetry-backup-*")))
+        self.assertFalse(list(self.target.parent.glob(".im-novelist-backup-*")))
 
     def test_update_restores_existing_folder_if_new_folder_cannot_be_placed(self):
         install(ROOT, self.target)
@@ -83,7 +83,7 @@ class InstallerTests(unittest.TestCase):
         original_rename = Path.rename
 
         def fail_stage_rename(path, destination):
-            if path.name.startswith(".im-poetry-stage-"):
+            if path.name.startswith(".im-novelist-stage-"):
                 raise OSError("simulated failure")
             return original_rename(path, destination)
 
@@ -91,7 +91,7 @@ class InstallerTests(unittest.TestCase):
             with self.assertRaises(OSError):
                 install(ROOT, self.target, update=True)
         self.assertEqual(existing_files(self.target), before)
-        self.assertFalse(list(self.target.parent.glob(".im-poetry-stage-*")))
+        self.assertFalse(list(self.target.parent.glob(".im-novelist-stage-*")))
 
     def test_dry_run_creates_nothing(self):
         install(ROOT, self.target, dry_run=True)
@@ -115,7 +115,7 @@ class InstallerTests(unittest.TestCase):
                  "--project", str(self.base)], text=True, capture_output=True
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
-            self.assertTrue((self.base / directory / "skills/im-poetry/SKILL.md").is_file())
+            self.assertTrue((self.base / directory / "skills/im-novelist/SKILL.md").is_file())
 
     def test_conflicting_cli_options_fail(self):
         completed = subprocess.run(
@@ -124,6 +124,66 @@ class InstallerTests(unittest.TestCase):
         )
         self.assertNotEqual(completed.returncode, 0)
         self.assertFalse(self.target.exists())
+
+
+class LegacyMigrationTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+        self.legacy = self.base / "im-poetry"
+        self.target = self.base / "im-novelist"
+        self.legacy.mkdir()
+        (self.legacy / "SKILL.md").write_text("---\nname: im-poetry\n---\nlegacy\n")
+        (self.legacy / "notes.txt").write_text("keep my notes")
+
+    def test_migrates_and_preserves_entire_legacy_folder(self):
+        before = existing_files(self.legacy)
+        message = migrate_legacy(ROOT, self.target, self.legacy)
+        self.assertIn("Migrated:", message)
+        self.assertFalse(self.legacy.exists())
+        backups = list(self.base.glob(".im-poetry-backup-*"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(existing_files(backups[0]), before)
+        self.assertEqual(existing_files(self.target), package_files(ROOT))
+
+    def test_dry_run_does_not_write(self):
+        before = existing_files(self.legacy)
+        self.assertIn("Would migrate", migrate_legacy(ROOT, self.target, self.legacy, dry_run=True))
+        self.assertEqual(existing_files(self.legacy), before)
+        self.assertEqual(list(self.base.iterdir()), [self.legacy])
+
+    def test_existing_new_name_or_other_legacy_skill_is_rejected(self):
+        install(ROOT, self.target)
+        with self.assertRaises(FileExistsError):
+            migrate_legacy(ROOT, self.target, self.legacy)
+        self.assertTrue(self.legacy.exists())
+        other_target = self.base / "other-target"
+        (self.legacy / "SKILL.md").write_text("---\nname: other\n---\n")
+        with self.assertRaises(ValueError):
+            migrate_legacy(ROOT, other_target, self.legacy)
+        self.assertFalse(other_target.exists())
+
+    def test_failure_restores_legacy_folder(self):
+        before = existing_files(self.legacy)
+        original_rename = Path.rename
+        def fail_destination(path, destination):
+            if path.name == "skill" and destination == self.target:
+                raise OSError("simulated migration failure")
+            return original_rename(path, destination)
+        with patch.object(Path, "rename", autospec=True, side_effect=fail_destination):
+            with self.assertRaises(OSError):
+                migrate_legacy(ROOT, self.target, self.legacy)
+        self.assertEqual(existing_files(self.legacy), before)
+        self.assertFalse(self.target.exists())
+        self.assertFalse(list(self.base.glob(".im-novelist-migrate-*")))
+
+    def test_symlink_legacy_is_rejected(self):
+        link = self.base / "legacy-link"
+        link.symlink_to(self.legacy, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            migrate_legacy(ROOT, self.target, link)
+        self.assertTrue(self.legacy.exists())
 
 
 class PromptTests(unittest.TestCase):

@@ -22,7 +22,7 @@ def check(root: Path) -> list[str]:
         "references/patterns.md", "references/meaning.md", "references/voice.md",
         "references/long-form.md", "references/checks.md", "references/applications.md", "scripts/count_text.py",
         "docs/compatibility.md", "docs/research.md", "docs/evaluation.md",
-        "prompts/im-poetry.md", "evals/cases.json",
+        "prompts/im-novelist.md", "evals/cases.json",
     )
     for name in required:
         if not (root / name).is_file():
@@ -47,7 +47,7 @@ def check(root: Path) -> list[str]:
         errors.append("Missing frontmatter")
     if set(metadata) != {"name", "description"}:
         errors.append("Keep portable frontmatter to name and description")
-    if metadata.get("name") != "im-poetry":
+    if metadata.get("name") != "im-novelist":
         errors.append("Wrong skill name")
     if not 1 <= len(metadata.get("description", "")) <= 1024:
         errors.append("Description must have 1..1024 characters")
@@ -55,7 +55,7 @@ def check(root: Path) -> list[str]:
         errors.append("SKILL.md must stay below 500 lines")
     try:
         expected = render(skill)
-        if (root / "prompts/im-poetry.md").read_text(encoding="utf-8") != expected:
+        if (root / "prompts/im-novelist.md").read_text(encoding="utf-8") != expected:
             errors.append("Standalone prompt is out of date")
         if len(expected) > 8000:
             errors.append("Standalone prompt exceeds the project's 8000-character budget")

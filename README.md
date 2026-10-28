@@ -1,4 +1,6 @@
-# im-poetry
+# im-novelist
+
+기존 `im-poetry`의 의미 보존·자연스러운 산문 퇴고 기능을 별도 스킬과 저장소로 이어갑니다. 기존 저장소와 로컬 설치본의 삭제는 이 프로젝트의 설치 과정에서 자동 수행하지 않습니다. 문학적·시적 표현을 적극적으로 더하고 싶다면 별도 스킬 [im-poet](https://github.com/jhchoi0309/im-poet)을 사용하세요.
 
 **글의 뜻과 말투를 살리며 AI식 표현을 다듬는 한국어 퇴고 스킬입니다.**
 
@@ -6,7 +8,7 @@
 
 Claude, Gemini, GPT에서 같은 편집 원칙을 사용할 수 있습니다. Agent Skills를 지원하는 도구에는 스킬 폴더를 설치하고, 일반 대화창에는 독립 프롬프트를 붙여 넣습니다. 사용에 API 키나 외부 서비스는 필요하지 않습니다.
 
-## im-poetry의 강점
+## im-novelist의 강점
 
 - **의미가 달라지지 않도록 살핍니다.** 시도와 성공, 가능성과 실제 발생, 개인과 팀의 역할을 구분합니다. 수치·날짜·인과관계·평가 조건도 원문과 대조해 함부로 강화하거나 지우지 않도록 합니다.
 - **글쓴이의 목소리를 존중합니다.** '아직', '수 있다', 피동문처럼 의미나 감정을 담을 수 있는 표현을 금칙어로 취급하지 않습니다. 에세이의 여백과 망설임, 필요한 긴 문장과 반복도 문맥을 보고 살립니다.
@@ -30,7 +32,7 @@ Claude, Gemini, GPT에서 같은 편집 원칙을 사용할 수 있습니다. Ag
 
 ## 바로 쓰기: Claude · Gemini · ChatGPT
 
-1. [독립 프롬프트](prompts/im-poetry.md)의 **전체 내용**을 복사합니다. GitHub 화면에서는 Raw로 열면 편합니다.
+1. [독립 프롬프트](prompts/im-novelist.md)의 **전체 내용**을 복사합니다. GitHub 화면에서는 Raw로 열면 편합니다.
 2. 새 대화의 첫 메시지에 붙여 넣습니다. 단순히 저장소 URL만 보내는 것보다 전문을 전달하는 편이 확실합니다.
 3. 다음 메시지에 편집할 글과 요청을 보냅니다.
 
@@ -45,11 +47,26 @@ Claude의 프로젝트 지침이나 Gemini의 Gem 지침을 사용하는 경우�
 
 ## Agent Skills로 설치하기
 
+### 이전 `im-poetry` 설치본에서 이름 바꾸기
+
+새 저장소 이름은 `im-novelist`입니다. 이전 주소에서 받은 로컬 저장소는 원격 주소를 갱신하세요. 설치된 스킬 폴더 이름은 자동으로 바뀌지 않으므로, 기존 설치본은 `--migrate-from`으로 지정합니다. 이전 폴더 전체를 백업하고 새 이름으로 설치합니다. 새 이름의 폴더가 이미 있으면 중단하며, 기존 폴더나 심볼릭 링크를 임의로 덮어쓰지 않습니다.
+
+```bash
+git remote set-url origin https://github.com/jhchoi0309/im-novelist.git
+python3 scripts/install.py --target claude --migrate-from ~/.claude/skills/im-poetry
+python3 scripts/install.py --target gemini --migrate-from ~/.gemini/skills/im-poetry
+python3 scripts/install.py --target codex --migrate-from ~/.agents/skills/im-poetry
+```
+
+설치했던 도구에 해당하는 명령만 사용하세요. 설치 경로를 따로 지정했다면 실제 이전 경로를 전달하세요. ChatGPT 개인 스킬과 맥의 도구별 설치본은 각각 별개입니다.
+
+### 새로 설치하기
+
 Python 3.10 이상이 필요합니다. 실행 전 코드를 확인할 수 있으며, 설치기는 네트워크를 사용하지 않습니다. 기본 설치에서는 기존 스킬이나 설정 파일을 덮어쓰지 않습니다.
 
 ```bash
-git clone https://github.com/jhchoi0309/im-poetry.git
-cd im-poetry
+git clone https://github.com/jhchoi0309/im-novelist.git
+cd im-novelist
 
 # 원하는 도구 하나를 선택합니다.
 python3 scripts/install.py --target claude
@@ -59,9 +76,9 @@ python3 scripts/install.py --target codex
 
 | 도구 | 사용자 설치 위치 | 사용 방법 |
 | --- | --- | --- |
-| Claude Code | `~/.claude/skills/im-poetry/` | `/im-poetry`와 편집할 글을 전달 |
-| Gemini CLI | `~/.gemini/skills/im-poetry/` | `im-poetry`로 다듬어 달라고 요청 |
-| Codex | `~/.agents/skills/im-poetry/` | `$im-poetry`와 편집할 글을 전달 |
+| Claude Code | `~/.claude/skills/im-novelist/` | `/im-novelist`와 편집할 글을 전달 |
+| Gemini CLI | `~/.gemini/skills/im-novelist/` | `im-novelist`로 다듬어 달라고 요청 |
+| Codex | `~/.agents/skills/im-novelist/` | `$im-novelist`와 편집할 글을 전달 |
 
 특정 프로젝트에만 설치하려면 `--project /path/to/project`를 추가하세요. 설치 내용을 미리 확인하려면 `--dry-run`을 추가하세요. Gemini CLI는 `.agents/skills`도 읽으므로 Codex 경로의 공용 스킬을 사용할 수도 있습니다. 설치 위치를 여러 곳에 만들었다면 도구의 우선순위를 확인하세요.
 
@@ -69,7 +86,7 @@ python3 scripts/install.py --target codex
 python3 scripts/install.py --target claude --project /path/to/project --dry-run
 ```
 
-이미 다른 내용의 `im-poetry` 폴더가 있으면 기본 설치가 중단됩니다. 기존 스킬을 업데이트하려면 저장소의 최신 버전을 받은 뒤 대상별로 `--update`를 추가하세요. 이전 폴더 전체는 같은 스킬 디렉터리 안의 숨김 백업 폴더에 보관하고 경로를 출력합니다. 다른 스킬이거나 심볼릭 링크인 경우에는 교체하지 않습니다. `--destination /exact/path/im-poetry`로 다른 정확한 위치를 지정할 수도 있습니다.
+이미 다른 내용의 `im-novelist` 폴더가 있으면 기본 설치가 중단됩니다. 기존 스킬을 업데이트하려면 저장소의 최신 버전을 받은 뒤 대상별로 `--update`를 추가하세요. 이전 폴더 전체는 같은 스킬 디렉터리 안의 숨김 백업 폴더에 보관하고 경로를 출력합니다. 다른 스킬이거나 심볼릭 링크인 경우에는 교체하지 않습니다. `--destination /exact/path/im-novelist`로 다른 정확한 위치를 지정할 수도 있습니다.
 
 ```bash
 git pull --ff-only
@@ -102,7 +119,7 @@ python3 scripts/count_text.py 원고.txt --encoding utf-8 --newlines lf --max-by
 | --- | --- |
 | [SKILL.md](SKILL.md) | 공통 지침과 작업 순서 |
 | [references](references) | 패턴·의미·목소리, 긴 글·지원서 예시와 선택형 검사 절차 |
-| [prompts/im-poetry.md](prompts/im-poetry.md) | 파일 접근이 없는 대화창용 독립 프롬프트 |
+| [prompts/im-novelist.md](prompts/im-novelist.md) | 파일 접근이 없는 대화창용 독립 프롬프트 |
 | [docs/compatibility.md](docs/compatibility.md) | 서비스별 설치와 사용 범위 |
 | [docs/research.md](docs/research.md) | 출처, 근거의 범위, 설계에 반영한 판단 |
 | [docs/evaluation.md](docs/evaluation.md) | 평가 방법과 검증 범위 |
@@ -127,4 +144,4 @@ python3 -m unittest discover -s tests -v
 
 [MIT License](LICENSE). 참고 자료의 저작권은 각 권리자에게 있습니다. 원본 이미지와 책의 본문을 재배포하지 않으며, 공통 원칙과 예문은 이 프로젝트에 맞게 작성했습니다.
 
-English: A provider-neutral Korean prose editing skill. Install the Agent Skills package in Claude Code, Gemini CLI, or Codex, or paste `prompts/im-poetry.md` into a chat. Preserve meaning and voice; edit formulaic phrasing in context.
+English: A provider-neutral Korean prose editing skill. Install the Agent Skills package in Claude Code, Gemini CLI, or Codex, or paste `prompts/im-novelist.md` into a chat. Preserve meaning and voice; edit formulaic phrasing in context.

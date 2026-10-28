@@ -10,7 +10,7 @@ import shutil
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-NAME = "im-poetry"
+NAME = "im-novelist"
 PACKAGE = ("SKILL.md", "references", "agents", "LICENSE", "scripts/count_text.py")
 LOCATIONS = {
     "claude": Path(".claude/skills"),
@@ -31,7 +31,7 @@ def package_files(source: Path) -> dict[str, bytes]:
                 raise ValueError(f"Package contains a symlink: {candidate.name}")
             if candidate.is_file():
                 result[candidate.relative_to(source).as_posix()] = candidate.read_bytes()
-    if not result.get("SKILL.md", b"").startswith(b"---\nname: im-poetry\n"):
+    if not result.get("SKILL.md", b"").startswith(b"---\nname: im-novelist\n"):
         raise ValueError("Unexpected skill name or missing frontmatter")
     return result
 
@@ -63,13 +63,13 @@ def install(source: Path, target: Path, *, dry_run: bool = False, update: bool =
                 "Use --update to keep a backup and replace it, or choose --destination. "
                 "Nothing was overwritten."
             )
-        if not previous.get("SKILL.md", b"").startswith(b"---\nname: im-poetry\n"):
-            raise ValueError(f"Existing destination is not an im-poetry skill: {target}")
+        if not previous.get("SKILL.md", b"").startswith(b"---\nname: im-novelist\n"):
+            raise ValueError(f"Existing destination is not an im-novelist skill: {target}")
     if dry_run:
         verb = "update with backup" if updating else "install"
         return f"Would {verb} {len(files)} files: {target}"
     target.parent.mkdir(parents=True, exist_ok=True)
-    stage = Path(tempfile.mkdtemp(prefix=".im-poetry-stage-", dir=target.parent))
+    stage = Path(tempfile.mkdtemp(prefix=".im-novelist-stage-", dir=target.parent))
     try:
         for relative, data in files.items():
             destination = stage / relative
@@ -79,7 +79,7 @@ def install(source: Path, target: Path, *, dry_run: bool = False, update: bool =
             # Preserve all existing files, including user additions, before replacing.
             if target.is_symlink() or not target.is_dir() or existing_files(target) != previous:
                 raise FileExistsError(f"Destination changed during installation: {target}")
-            backup = Path(tempfile.mkdtemp(prefix=".im-poetry-backup-", dir=target.parent))
+            backup = Path(tempfile.mkdtemp(prefix=".im-novelist-backup-", dir=target.parent))
             backup.rmdir()
             target.rename(backup)
             try:
@@ -101,6 +101,44 @@ def install(source: Path, target: Path, *, dry_run: bool = False, update: bool =
     return f"Installed: {target}"
 
 
+def migrate_legacy(source: Path, target: Path, legacy: Path, *, dry_run: bool = False) -> str:
+    """Move an explicitly selected im-poetry install into a backup, then install this name."""
+    files = package_files(source)
+    if os.path.lexists(target):
+        raise FileExistsError(f"New destination already exists; migration stopped: {target}")
+    if legacy.is_symlink() or not legacy.is_dir():
+        raise ValueError(f"Legacy destination must be a real skill directory: {legacy}")
+    previous = existing_files(legacy)
+    if not previous.get("SKILL.md", b"").startswith(b"---\nname: im-poetry\n"):
+        raise ValueError(f"Legacy destination is not an im-poetry skill: {legacy}")
+    if target.absolute().is_relative_to(legacy.absolute()):
+        raise ValueError("New destination cannot be inside the legacy skill")
+    if dry_run:
+        return f"Would migrate with backup {len(files)} files: {legacy} -> {target}"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    stage = Path(tempfile.mkdtemp(prefix=".im-novelist-migrate-", dir=target.parent))
+    try:
+        staged_skill = stage / "skill"
+        install(source, staged_skill)
+        if legacy.is_symlink() or not legacy.is_dir() or existing_files(legacy) != previous:
+            raise FileExistsError(f"Legacy destination changed during migration: {legacy}")
+        backup = Path(tempfile.mkdtemp(prefix=".im-poetry-backup-", dir=legacy.parent))
+        backup.rmdir()
+        legacy.rename(backup)
+        try:
+            if os.path.lexists(target):
+                raise FileExistsError(f"Destination appeared during migration: {target}")
+            staged_skill.rename(target)
+        except BaseException:
+            if not os.path.lexists(legacy):
+                backup.rename(legacy)
+            raise
+        return f"Migrated: {target}\nBackup: {backup}"
+    finally:
+        if stage.exists():
+            shutil.rmtree(stage)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     choice = parser.add_mutually_exclusive_group(required=True)
@@ -108,10 +146,13 @@ def main() -> int:
     choice.add_argument("--destination", type=Path, help="Exact destination skill directory")
     parser.add_argument("--project", type=Path, help="Project root; default is the user home")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--update", action="store_true", help="Back up and replace an existing im-poetry skill")
+    parser.add_argument("--update", action="store_true", help="Back up and replace an existing im-novelist skill")
+    parser.add_argument("--migrate-from", type=Path, help="Back up this legacy im-poetry directory and install as im-novelist")
     args = parser.parse_args()
     if args.destination and args.project:
         parser.error("--project cannot be combined with --destination")
+    if args.update and args.migrate_from:
+        parser.error("--update cannot be combined with --migrate-from")
     base = args.project.expanduser().resolve() if args.project else Path.home()
     target = (
         args.destination.expanduser().absolute()
@@ -119,7 +160,10 @@ def main() -> int:
         else base / LOCATIONS[args.target] / NAME
     )
     try:
-        print(install(ROOT, target, dry_run=args.dry_run, update=args.update))
+        if args.migrate_from:
+            print(migrate_legacy(ROOT, target, args.migrate_from.expanduser().absolute(), dry_run=args.dry_run))
+        else:
+            print(install(ROOT, target, dry_run=args.dry_run, update=args.update))
     except (OSError, ValueError) as exc:
         parser.exit(1, f"Installation stopped: {exc}\n")
     return 0

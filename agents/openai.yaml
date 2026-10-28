@@ -1,0 +1,4 @@
+interface:
+  display_name: "im-poetry"
+  short_description: "원문의 의미와 목소리를 지키며 한국어 AI 문체를 자연스럽게 다듬습니다"
+  default_prompt: "Use $im-poetry to edit the following Korean text while preserving its meaning and voice."
